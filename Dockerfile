@@ -40,25 +40,26 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
 # As of 03-jul-16: You have been warned, DO NOT push this button: RUN npm update -g npm
 # https://github.com/npm/npm/issues/9863 Reinstalling npm v3 fails on Docker
 
+# reqd when running as root TODO use some default user
+RUN npm config set unsafe-perm true --global
 
-# no global npms at all
-## RUN npm install -g --unsafe-perm -y gulp@3.9.1
-## RUN npm install -g --unsafe-perm -y ionic@beta
+# avoid global npms at all costs as they create flaky builds
+## RUN npm install -g -y gulp@3.9.1
+## RUN npm install -g -y ionic@beta
 
 COPY readme.txt /readme.txt
 COPY start.sh /start.sh
 
-ADD xvfb.init /etc/init.d/xvfb
-RUN chmod +x /etc/init.d/xvfb && update-rc.d xvfb defaults
+COPY xvfb.init /etc/init.d/xvfb
+RUN chmod +x /etc/init.d/xvfb && chmod +x /start.sh && update-rc.d xvfb defaults
 
-WORKDIR /projects
-
-ADD entrypoint.sh /entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# starts and stops xvfb on DISPLAY :99
 ENTRYPOINT ["/entrypoint.sh"]
 
-CMD bash -C '/start.sh';'bash'
+CMD '/start.sh';'bash'
 
 # TODO check port list
 # ports 8100 and 35729 used by ionic serve (default ports)
@@ -73,6 +74,8 @@ EXPOSE 3000 3001 3002 4000 4444 5000 5901 8100 8080 9876 35729
 
 # dbus said to fix some hangs running Chrome within Docker - who knows?
 ENV DBUS_SESSION_BUS_ADDRESS="/dev/null" DISPLAY=:99
+
+WORKDIR /projects
 
 # Root for Angular and Ionic projects
 VOLUME /projects

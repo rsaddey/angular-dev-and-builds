@@ -14,6 +14,8 @@ MAINTAINER Reiner Saddey <reiner@saddey.net>
 
 LABEL Description="Proof of concept (work in progress) for developing and building Angular 2 applications"
 
+# TODO reduce layers
+
 RUN apt-get update
 
 RUN apt-get install -y -q curl wget
@@ -35,15 +37,6 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
     google-chrome-stable \
     default-jre
 
-# for split in two to lower bandwidth (docker image cache)
-
-# add
-RUN apt-get install -y -q \
-    xvfb \
-    && apt-get -y autoclean \
-    && rm -rf /var/lib/apt/lists/*
-
-
 # As of 03-jul-16: You have been warned, DO NOT push this button: RUN npm update -g npm
 # https://github.com/npm/npm/issues/9863 Reinstalling npm v3 fails on Docker
 
@@ -55,10 +48,15 @@ RUN apt-get install -y -q \
 COPY readme.txt /readme.txt
 COPY start.sh /start.sh
 
-# said to fix some hangs running Chrome within Docker - who knows?
-ENV DBUS_SESSION_BUS_ADDRESS /dev/null
+ADD xvfb.init /etc/init.d/xvfb
+RUN chmod +x /etc/init.d/xvfb && update-rc.d xvfb defaults
 
 WORKDIR /projects
+
+ADD entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD bash -C '/start.sh';'bash'
 
@@ -72,6 +70,9 @@ CMD bash -C '/start.sh';'bash'
 # 28-jul-16 expose port 4000 for webpackServer dev ionic
 # 28-jul-16 expose port 5901 for vnc
 EXPOSE 3000 3001 3002 4000 4444 5000 5901 8100 8080 9876 35729
+
+# dbus said to fix some hangs running Chrome within Docker - who knows?
+ENV DBUS_SESSION_BUS_ADDRESS="/dev/null" DISPLAY=:99
 
 # Root for Angular and Ionic projects
 VOLUME /projects

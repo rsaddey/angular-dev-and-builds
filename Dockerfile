@@ -25,6 +25,7 @@ RUN apt-get install -y -q curl wget
 RUN curl -sL https://deb.nodesource.com/setup_5.x | bash -
 
 # nodejs includes matching npm as well
+# TODO add clean
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
     echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list && \
     apt-get update && \
@@ -46,6 +47,15 @@ RUN npm config set unsafe-perm true --global
 # avoid global npms at all costs as they create flaky builds
 ## RUN npm install -g -y gulp@3.9.1
 ## RUN npm install -g -y ionic@beta
+
+# TODO it'saterriblehack see https://github.com/paimpozhil/docker-novnc
+RUN apt-get install -y -q \
+    git x11vnc wget python python-numpy unzip && \
+    cd /root && git clone https://github.com/kanaka/noVNC.git && \
+    cd noVNC/utils && git clone https://github.com/kanaka/websockify websockify && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 
 COPY readme.txt /readme.txt
 COPY start.sh /start.sh
@@ -69,8 +79,8 @@ CMD '/start.sh';'bash'
 # 25-jul-16 expose port 9876 for Karma
 # 28-jul-16 expose port 4444 for Selenium
 # 28-jul-16 expose port 4000 for webpackServer dev ionic
-# 28-jul-16 expose port 5901 for vnc
-EXPOSE 3000 3001 3002 4000 4444 5000 5901 8100 8080 9876 35729
+# 01-aug-16 expose ports 5900 (vnc) 6080 (noVNC)
+EXPOSE 3000 3001 3002 4000 4444 5000 5900 6080 8100 8080 9876 35729
 
 # dbus said to fix some hangs running Chrome within Docker - who knows?
 ENV DBUS_SESSION_BUS_ADDRESS="/dev/null" DISPLAY=:99

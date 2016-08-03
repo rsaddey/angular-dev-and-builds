@@ -52,16 +52,18 @@ RUN npm config set unsafe-perm true --global
 RUN apt-get install -y -q \
     git x11vnc wget python python-numpy unzip && \
     cd /root && git clone https://github.com/kanaka/noVNC.git && \
-    cd noVNC/utils && git clone https://github.com/kanaka/websockify websockify && \
+    cd noVNC && ln -s vnc_auto.html index.html && \
+    cd utils && git clone https://github.com/kanaka/websockify websockify && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 
 COPY readme.txt /readme.txt
 COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
-COPY xvfb.init /etc/init.d/xvfb
-RUN chmod +x /etc/init.d/xvfb && chmod +x /start.sh && update-rc.d xvfb defaults
+# COPY xvfb.init /etc/init.d/xvfb
+# RUN chmod +x /etc/init.d/xvfb && update-rc.d xvfb defaults
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

@@ -33,6 +33,7 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
     iputils-ping net-tools \
     nodejs \
     bzip2 \
+    zip \
     libfontconfig \
     xvfb \
     google-chrome-stable \

@@ -59,6 +59,13 @@ RUN apt-get install -y -q \
     rm -rf /var/lib/apt/lists/*
 
 
+
+# Set the locale to German
+RUN locale-gen de_DE.UTF-8
+ENV LANG de_US.UTF-8
+ENV LANGUAGE de_DE:de
+ENV LC_ALL de_DE.UTF-8 
+
 COPY readme.txt /readme.txt
 COPY start.sh /start.sh
 RUN chmod +x /start.sh

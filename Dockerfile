@@ -64,7 +64,7 @@ RUN apt-get install -y -q \
 RUN locale-gen de_DE.UTF-8
 ENV LANG de_US.UTF-8
 ENV LANGUAGE de_DE:de
-ENV LC_ALL de_DE.UTF-8 
+ENV LC_ALL de_DE.UTF-8
 
 COPY readme.txt /readme.txt
 COPY start.sh /start.sh
@@ -98,4 +98,6 @@ ENV DBUS_SESSION_BUS_ADDRESS="/dev/null" DISPLAY=:99
 WORKDIR /projects
 
 # Root for Angular and Ionic projects
-VOLUME /projects
+# Do NOT use VOLUME statement as it may result in numerous orphaned volumes
+# when innocent users or apps just run docker run --rm ... bash
+# VOLUME /projects

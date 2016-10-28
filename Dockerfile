@@ -7,6 +7,7 @@
 #            -v /Users/rsaddey/Documents/PreApproval/Dockers/projects/:/projects \
 #            rsaddey/angular-dev-and-builds
 #
+# rebuilt 28-oct-16 in order to use google-chrome-stable amd64 54.0.2840.71-1
 
 FROM ubuntu:16.04
 
